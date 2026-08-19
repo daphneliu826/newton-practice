@@ -33,12 +33,23 @@ def optimize(x0, f, tol=1e-6, max_iter=100):
     iteration : int
         Number of iterations performed.
     """
+    if not callable(f):
+        raise TypeError(f"Argument is not a function, it is of type {type(f)}")
+    
+    if x0 > 1e7:
+        raise RuntimeError(f"At iteration {iter}, optimization appears to be diverging")
+
     for iteration in range(max_iter):
         fp = derivative(f, x0)
         fpp = second_derivative(f, x0)
 
         if np.abs(fp) < tol:
             break
+
+        if np.abs(fpp) < 1e-10:
+            raise ValueError(
+                "Second derivative is too close to zero."
+            )
 
         x0 = x0 - fp / fpp
     return x0, iteration
