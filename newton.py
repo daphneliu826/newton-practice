@@ -53,3 +53,59 @@ def optimize(x0, f, tol=1e-6, max_iter=100):
 
         x0 = x0 - fp / fpp
     return x0, iteration
+
+def gradient(f, x, eps=1e-5):
+    """Estimate the gradient of a multivariate function."""
+    grad = np.zeros_like(x, dtype=float)
+
+    for i in range(len(x)):
+        x_step = x.copy()
+        x_step[i] += eps
+        grad[i] = (f(x_step) - f(x)) / eps
+
+    return grad
+
+
+def hessian(f, x, eps=1e-5):
+    """Estimate the Hessian matrix of a multivariate function."""
+    n = len(x)
+    hess = np.zeros((n, n))
+
+    for i in range(n):
+        for j in range(n):
+            x_ij = x.copy()
+            x_i = x.copy()
+            x_j = x.copy()
+
+            x_ij[i] += eps
+            x_ij[j] += eps
+            x_i[i] += eps
+            x_j[j] += eps
+
+            hess[i, j] = (
+                f(x_ij) - f(x_i) - f(x_j) + f(x)
+            ) / eps**2
+
+    return hess
+
+
+def optimize_multivariate(x0, f, tol=1e-6, max_iter=100):
+    """Minimize a multivariate function using Newton's method."""
+    x = np.array(x0, dtype=float)
+
+    for iteration in range(max_iter):
+        grad = gradient(f, x)
+        hess = hessian(f, x)
+
+        if np.linalg.norm(grad) < tol:
+            return x, iteration
+
+        step = np.linalg.solve(hess, grad)
+        x_new = x - step
+
+        if np.linalg.norm(x_new - x) < tol:
+            return x_new, iteration + 1
+
+        x = x_new
+
+    return x, max_iter
