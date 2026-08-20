@@ -3,8 +3,8 @@ import numpy as np
 
 # Estimate the first and second derivatives.
 def derivative(f, x, eps=1e-5):
-    """Estimate the first derivative of a function using finite differences."""
-    return (f(x + eps) - f(x)) / eps
+    """Estimate the first derivative of a function using central differences."""
+    return (f(x + eps) - f(x - eps)) / (2 * eps)
 
 
 def second_derivative(f, x, eps=1e-5):
